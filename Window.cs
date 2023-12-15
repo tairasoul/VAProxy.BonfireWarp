@@ -1,6 +1,5 @@
 ﻿using Devdog.General.UI;
 using HarmonyLib;
-using Invector.vCharacterController;
 using System.Collections;
 using UIWindowPageFramework;
 using UnityEngine;
@@ -56,22 +55,43 @@ namespace BonfireWarp
             }
         }
 
+        private bool isSitting = false;
+
         private IEnumerator TeleportTo(GameObject obj)
         {
             UIWindow Page = GameObject.Find("MAINMENU/Canvas/Pages").GetComponent<UIWindow>();
             Omni omni = GameObject.FindFirstObjectByType<Omni>();
             Inventory inv = GameObject.FindFirstObjectByType<Inventory>();
             Page.Hide();
-            inv.inp.enabled = false;
+            isSitting = true;
+            inv.anim.StopPlayback();
+            inv.anim.Play("Camp");
             inv.inp.SetLockAllInput(true);
-            omni.GetComponent<Animator>().Play("LandLow");
+            //inv.inp.enabled = false;
+            yield return new WaitForSeconds(1f);
             omni.Fade();
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1f);
             Station station = obj.GetComponent<Station>();
             station.Context.Invoke();
             inv.transform.position = station.spawn.position;
-            yield return new WaitForSeconds(1f);
-            inv.inp.enabled = true;
+            yield return new WaitForSeconds(1.5f);
+            StartCoroutine(StandupHorizontal());
+        }
+
+        private IEnumerator StandupHorizontal()
+        {
+            Inventory inv = GameObject.FindFirstObjectByType<Inventory>();
+            //inv.inp.enabled = true;
+            while (isSitting)
+            {
+                if (BepInEx.UnityInput.Current.anyKeyDown)
+                {
+                    inv.anim.CrossFade("Null", 0.48f, 7);
+                    isSitting = false;
+                    yield return new WaitForSeconds(0.8f);
+                }
+                yield return null;
+            }
             inv.inp.SetLockAllInput(false);
         }
 
@@ -83,6 +103,10 @@ namespace BonfireWarp
             static void Postfix()
             {
                 foreach (GameObject Button in RegisteredViewport.GetChildren())
+                {
+                    Destroy(Button);
+                }
+                foreach (GameObject Button in Viewport.GetChildren())
                 {
                     Destroy(Button);
                 }
