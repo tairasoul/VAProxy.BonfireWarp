@@ -18,7 +18,7 @@ namespace BonfireWarp
         }
     }
 
-    [BepInPlugin("tairasoul.vaproxy.bonfirewarp", "BonfireWarp", "1.0.0")]
+    [BepInPlugin("tairasoul.vaproxy.bonfirewarp", "BonfireWarp", "1.1.0")]
     public class Plugin : BaseUnityPlugin
     {
         private Harmony harmony = new Harmony("tairasoul.vaproxy.bonfirewarp");
