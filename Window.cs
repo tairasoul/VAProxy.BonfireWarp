@@ -1,5 +1,6 @@
 ﻿using Devdog.General.UI;
-using System;
+using HarmonyLib;
+using Invector.vCharacterController;
 using System.Collections;
 using UIWindowPageFramework;
 using UnityEngine;
@@ -55,6 +56,39 @@ namespace BonfireWarp
             }
         }
 
+        private IEnumerator TeleportTo(GameObject obj)
+        {
+            UIWindow Page = GameObject.Find("MAINMENU/Canvas/Pages").GetComponent<UIWindow>();
+            Omni omni = GameObject.FindFirstObjectByType<Omni>();
+            Inventory inv = GameObject.FindFirstObjectByType<Inventory>();
+            Page.Hide();
+            inv.inp.enabled = false;
+            inv.inp.SetLockAllInput(true);
+            omni.GetComponent<Animator>().Play("LandLow");
+            omni.Fade();
+            yield return new WaitForSeconds(2f);
+            Station station = obj.GetComponent<Station>();
+            station.Context.Invoke();
+            inv.transform.position = station.spawn.position;
+            yield return new WaitForSeconds(1f);
+            inv.inp.enabled = true;
+            inv.inp.SetLockAllInput(false);
+        }
+
+        [HarmonyPatch(typeof(HomeScreen))]
+        static class HomeScreenPatches
+        {
+            [HarmonyPatch("Erase")]
+            [HarmonyPostfix]
+            static void Postfix()
+            {
+                foreach (GameObject Button in RegisteredViewport.GetChildren())
+                {
+                    Destroy(Button);
+                }
+            }
+        }
+
         private IEnumerator RegisterWindow()
         {
             while (!Framework.Ready)
@@ -82,15 +116,13 @@ namespace BonfireWarp
             group.startAxis = GridLayoutGroup.Axis.Horizontal;
             Framework.RegisterWindow(window, (GameObject win) =>
             {
-                GameObject RegisteredViewport = win.Find("Viewport");
+                RegisteredViewport = win.Find("Viewport");
                 foreach (Button button in RegisteredViewport.GetComponentsInChildren<Button>())
                 {
                     button.onClick.AddListener(() =>
                     {
                         GameObject @obj = GameObject.Find($"Saves/{button.name}");
-                        Station station = obj.GetComponent<Station>();
-                        station.Context.Invoke();
-                        GameObject.FindObjectOfType<Inventory>().transform.position = station.spawn.position;
+                        StartCoroutine(TeleportTo(obj));
                     });
                 }
             });
