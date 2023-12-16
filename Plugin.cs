@@ -36,7 +36,7 @@ namespace BonfireWarp
             NameReferences.Add("Station (5)", "Upper Sewers");
             NameReferences.Add("Station (6)", "Heating Structure F1");
             NameReferences.Add("Station (7)", "Lectors Archive");
-            NameReferences.Add("Station (8)", "ERI Grave, Front of Robot");
+            NameReferences.Add("Station (8)", "ERI Grave, Front of ERI");
             NameReferences.Add("Station (9)", "Rusty Outskirts, Buckets");
             NameReferences.Add("Station (10)", "Rusty Outskirts, Castle");
             harmony.PatchAll();
