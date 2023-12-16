@@ -75,6 +75,19 @@ namespace BonfireWarp
             station.Context.Invoke();
             inv.transform.position = station.spawn.position;
             yield return new WaitForSeconds(1.5f);
+            Station[] array = Object.FindObjectsOfType<Station>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i].current = false;
+            }
+            station.current = true;
+            for (int j = 0; j < Object.FindObjectOfType<Omni>().saveStations.Length; j++)
+            {
+                if (Object.FindObjectOfType<Omni>().saveStations[j].current)
+                {
+                    PlayerPrefs.SetInt("CS", j);
+                }
+            }
             StartCoroutine(StandupHorizontal());
         }
 
@@ -93,6 +106,7 @@ namespace BonfireWarp
                 yield return null;
             }
             inv.inp.SetLockAllInput(false);
+            Object.FindObjectOfType<DATA>().Save();
         }
 
         [HarmonyPatch(typeof(HomeScreen))]
