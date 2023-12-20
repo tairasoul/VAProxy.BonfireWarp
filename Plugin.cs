@@ -44,7 +44,10 @@ namespace BonfireWarp
 
         bool init = false;
 
-        internal void OnDestroy()
+        internal void OnDestroy() => Init();
+        internal void Start() => Init();
+
+        internal void Init()
         {
             if (!init)
             {
