@@ -4,6 +4,7 @@ using System.Collections;
 using UIWindowPageFramework;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace BonfireWarp
 {
