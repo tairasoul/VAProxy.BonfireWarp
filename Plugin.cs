@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using System.Collections.Generic;
@@ -25,9 +26,12 @@ namespace BonfireWarp
         private static Dictionary<string, string> NameReferences = new Dictionary<string, string>();
         public static ManualLogSource Log;
         private static Window WindowInstance;
+
+        private static ConfigEntry<bool> CheatMode;
         private void Awake()
         {
             Log = Logger;
+            CheatMode = Config.Bind("Cheats", "Unlock all", false, "Unlock all stations.");
             NameReferences.Add("Station", "Scrap Pits");
             NameReferences.Add("Station (1)", "Tower Base");
             NameReferences.Add("Station (2)", "ERI Grave");
@@ -57,7 +61,7 @@ namespace BonfireWarp
                 DontDestroyOnLoad(window);
                 foreach (string NameReference in NameReferences.Values)
                 {
-                    if (PlayerPrefs.GetInt(NameReference, 0) == 0)
+                    if (PlayerPrefs.GetInt(NameReference, 0) == 0 && !CheatMode.Value)
                     {
                         PlayerPrefs.SetInt(NameReference, 0);
                     }
@@ -78,7 +82,7 @@ namespace BonfireWarp
             {
                 string NameRef = NameReferences.GetValueSafe(__instance.name);
                 bool VisitedStation = PlayerPrefs.GetInt(NameRef) == 1;
-                if (!VisitedStation)
+                if (!VisitedStation && !CheatMode.Value)
                 {
                     PlayerPrefs.SetInt(NameRef, 1);
                     WindowInstance.StartCoroutine(WindowInstance.AddButton(NameRef, __instance.name));
